@@ -1,0 +1,31 @@
+name: Demo with minikube
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  with-minikube:
+    name: Test Camel K on Minikube
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v2.2.0
+        with:
+          minikube version: 'v1.15.1'
+          kubernetes version: 'v1.20.0'
+          driver: 'docker'
+      - name: Install Kamel
+        run: |
+            minikube addons enable registry
+            curl -Lo kamel.tar.gz https://github.com/apache/camel-k/releases/download/v1.2.1/camel-k-client-1.2.1-linux-64bit.tar.gz
+            tar -zxvf kamel.tar.gz
+            chmod +x kamel
+            sudo mv kamel /usr/local/bin/
+            kamel install
+      - name: Test kamel
+        run: kamel get
