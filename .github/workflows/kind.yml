@@ -1,0 +1,26 @@
+name: Demo with KinD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  with-minikube:
+    name: Test Camel K on KinD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup KinD
+        uses: engineerd/setup-kind@v0.5.0
+      - name: Install Kamel
+        run: |
+            curl -Lo kamel.tar.gz https://github.com/apache/camel-k/releases/download/v1.2.1/camel-k-client-1.2.1-linux-64bit.tar.gz
+            tar -zxvf kamel.tar.gz
+            chmod +x kamel
+            sudo mv kamel /usr/local/bin/
+            kamel install
+      - name: Test kamel
+        run: kamel get
